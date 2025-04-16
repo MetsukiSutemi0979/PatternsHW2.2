@@ -13,6 +13,25 @@ import java.util.Locale;
 import static io.restassured.RestAssured.given;
 
 public class DataGenerator {
+    private static final RequestSpecification requestSpec = new RequestSpecBuilder()
+            .setBaseUri("http://localhost")
+            .setPort(9999)
+            .setAccept(ContentType.JSON)
+            .setContentType(ContentType.JSON)
+            .log(LogDetail.ALL)
+            .build();
+
+    private static void sendRequest(RegistrationDto user) {
+        given()
+                .spec(requestSpec)
+                .body(user)
+                .when()
+                .post("/api/system/users") // Проверенный путь
+                .then()
+                .log().all()
+                .statusCode(200);
+    }
+
     private static final Faker faker = new Faker(new Locale("en"));
 
     private DataGenerator() {
@@ -41,6 +60,7 @@ public class DataGenerator {
 
         public static RegistrationDto getRegisteredUser(String status) {
             RegistrationDto registeredUser = getUser(status);
+            sendRequest(registeredUser);
             return registeredUser;
         }
     }
